@@ -3,7 +3,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-from model import create_gha_model
+
+from models import deit_tiny_patch16_224
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -12,6 +13,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 # =========================
 transform = transforms.Compose([
     transforms.Resize(224),
+    transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
 ])
@@ -19,60 +21,71 @@ transform = transforms.Compose([
 train_dataset = datasets.CIFAR10("/tmp/data", train=True, download=True, transform=transform)
 test_dataset = datasets.CIFAR10("/tmp/data", train=False, download=True, transform=transform)
 
-train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=16)
+train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4)
+test_loader = DataLoader(test_dataset, batch_size=128)
 
 # =========================
-# MODEL
+# MODEL (official DeiT)
 # =========================
-model = create_gha_model(num_classes=10, topk=8)
+model = deit_tiny_patch16_224(pretrained=False)
+
+# Change classifier to CIFAR
+model.head = nn.Linear(model.head.in_features, 10)
+
 model.to(DEVICE)
 
+# =========================
+# LOSS + OPTIM
+# =========================
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(model.parameters(), lr=3e-4)
 
+# =========================
+# TRAIN
+# =========================
 def train():
     model.train()
+    total_loss = 0
+
     for images, labels in train_loader:
         images, labels = images.to(DEVICE), labels.to(DEVICE)
 
         optimizer.zero_grad()
-        loss = criterion(model(images), labels)
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+
         loss.backward()
         optimizer.step()
-from sklearn.metrics import classification_report
 
+        total_loss += loss.item()
+
+    return total_loss / len(train_loader)
+
+# =========================
+# TEST
+# =========================
 def test():
     model.eval()
     correct = 0
     total = 0
 
-    all_preds = []
-    all_labels = []
-
     with torch.no_grad():
         for images, labels in test_loader:
             images, labels = images.to(DEVICE), labels.to(DEVICE)
-
             outputs = model(images)
-            _, preds = outputs.max(1)
 
-            # accuracy
+            _, preds = outputs.max(1)
             correct += preds.eq(labels).sum().item()
             total += labels.size(0)
 
-            # store for report
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(labels.cpu().numpy())
+    return 100 * correct / total
 
-    acc = 100 * correct / total
-
-    print("\nClassification Report:")
-    print(classification_report(all_labels, all_preds, digits=4))
-
-    return acc
-
+# =========================
+# LOOP
+# =========================
 for epoch in range(20):
-    train()
+    loss = train()
     acc = test()
-    print(f"Epoch {epoch}: {acc:.2f}%")
+
+    print(f"Epoch {epoch+1}: Loss={loss:.4f}, Acc={acc:.2f}%")
+    

@@ -17,4 +17,4 @@ def create_gha_model(num_classes=10, topk=8):
     # Modify classification head
     model.head = nn.Linear(model.head.in_features, num_classes)
 
-    return create_gha_model
+    return model
