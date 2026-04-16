@@ -1,1 +1,6 @@
-# dummy
+timm==0.9.12
+numpy
+scikit-learn
+matplotlib
+Pillow
+tqdm

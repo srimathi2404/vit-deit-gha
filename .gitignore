@@ -1,0 +1,56 @@
+# =========================
+# DATA (never push)
+# =========================
+data/
+datasets/
+
+# =========================
+# MODEL CHECKPOINTS
+# =========================
+*.pth
+*.pt
+*.ckpt
+checkpoints/
+models/
+saved_models/
+
+# =========================
+# EXPERIMENT OUTPUTS
+# =========================
+experiments/
+logs/
+runs/
+outputs/
+
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# =========================
+# NOTEBOOKS
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# ENV / SYSTEM FILES
+# =========================
+.env
+*.env
+*.log
+vit_env/
+
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE FILES
+# =========================
+.vscode/
+.idea/
