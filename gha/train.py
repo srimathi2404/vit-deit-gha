@@ -72,7 +72,7 @@ def test():
 
     return acc
 
-for epoch in range(20):
+for epoch in range(30):
     train()
     acc = test()
     print(f"Epoch {epoch}: {acc:.2f}%")
