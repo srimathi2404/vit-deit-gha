@@ -54,3 +54,22 @@ Thumbs.db
 # =========================
 .vscode/
 .idea/
+
+
+
+# Outputs
+vit_custom/outputs/
+outputs_gha/
+outputs_perturb_vit/
+output_perturb_gha/
+
+# Plots
+*.png
+*.jpg
+
+# Logs
+*.txt
+
+# Python cache
+__pycache__/
+*.pyc
