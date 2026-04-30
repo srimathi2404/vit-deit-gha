@@ -42,7 +42,7 @@ class GraphHeadAttention(Module):
         self.attend = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(dropout)
 
-        # 🔥 Learnable weights for multi-scale fusion
+        #  Learnable weights for multi-scale fusion
         self.scale_weights = nn.Parameter(torch.ones(len(k_list)))
 
         self.to_out = nn.Sequential(
@@ -59,7 +59,7 @@ class GraphHeadAttention(Module):
         dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
 
         # ---------------------------
-        # 🔥 Multi-scale sparse attention
+        #  Multi-scale sparse attention
         # ---------------------------
         sparse_attn_list = []
 
@@ -85,12 +85,12 @@ class GraphHeadAttention(Module):
         multi_sparse_attn = (weights * sparse_stack).sum(dim=0)
 
         # ---------------------------
-        # 🔥 Global attention
+        #  Global attention
         # ---------------------------
         global_attn = self.attend(dots)
 
         # ---------------------------
-        # 🔥 Combine
+        #  Combine
         # ---------------------------
         attn = multi_sparse_attn
 

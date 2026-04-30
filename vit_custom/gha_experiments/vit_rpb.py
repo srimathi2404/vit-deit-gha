@@ -59,7 +59,7 @@ class GraphHeadAttention(Module):
         )
 
         # ----------------------------------
-        # 🔥 Relative Position Bias
+        #  Relative Position Bias
         # ----------------------------------
         num_rel_positions = (2 * grid_size - 1) * (2 * grid_size - 1)
         self.rel_pos_bias_table = nn.Parameter(torch.zeros(num_rel_positions))
@@ -104,7 +104,7 @@ class GraphHeadAttention(Module):
         dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
 
         # ----------------------------------
-        # 🔥 Add Relative Position Bias
+        #  Relative Position Bias
         # ----------------------------------
         B, H, N, _ = dots.shape
         num_patches = self.grid_size * self.grid_size
@@ -118,7 +118,7 @@ class GraphHeadAttention(Module):
         dots = dots + full_bias.unsqueeze(0).unsqueeze(0)
 
         # ----------------------------------
-        # 🔥 Top-k sparse attention
+        #  Top-k sparse attention
         # ----------------------------------
         topk_vals, topk_idx = torch.topk(dots, self.k, dim=-1)
 
@@ -129,12 +129,12 @@ class GraphHeadAttention(Module):
         sparse_attn = self.attend(sparse_dots)
 
         # ----------------------------------
-        # 🔥 Global attention
+        # Global attention
         # ----------------------------------
         global_attn = self.attend(dots)
 
         # ----------------------------------
-        # 🔥 Combine
+        # Combine
         # ----------------------------------
         attn = sparse_attn
 

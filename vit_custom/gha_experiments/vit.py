@@ -57,7 +57,7 @@ class GraphHeadAttention(Module):
         dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
 
         # ---------------------------
-        # 🔥 Top-k mask (IMPORTANT FIX)
+        # Top-k mask (IMPORTANT FIX)
         # ---------------------------
         topk_vals, topk_idx = torch.topk(dots, self.k, dim=-1)
 
@@ -69,12 +69,12 @@ class GraphHeadAttention(Module):
         sparse_attn = self.attend(sparse_dots)
 
         # ---------------------------
-        # 🔥 Global attention (stability)
+        #  Global attention (stability)
         # ---------------------------
         global_attn = self.attend(dots)
 
         # ---------------------------
-        # 🔥 Combine (important)
+        #  Combine (important)
         # ---------------------------
         attn = (1 - self.alpha) * sparse_attn + self.alpha * global_attn
 

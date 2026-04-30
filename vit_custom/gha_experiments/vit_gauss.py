@@ -55,7 +55,7 @@ class GraphHeadAttention(Module):
         self.attend = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(dropout)
 
-        # 🔥 Learnable fusion weights
+        #  Learnable fusion weights
         self.scale_weights = nn.Parameter(torch.ones(len(k_list)))
 
         self.to_out = nn.Sequential(
@@ -63,7 +63,7 @@ class GraphHeadAttention(Module):
             nn.Dropout(dropout)
         )
 
-        # 🔥 Precompute Gaussian distance bias
+        #  Precompute Gaussian distance bias
         self.register_buffer("bias", self._create_distance_bias(grid_size, sigma))
 
 
@@ -85,7 +85,7 @@ class GraphHeadAttention(Module):
 
         num_patches = grid_size * grid_size
 
-        # 🔥 Add CLS token (no bias with others)
+        #  Add CLS token (no bias with others)
         full_bias = torch.zeros(num_patches + 1, num_patches + 1)
 
         full_bias[1:, 1:] = bias
@@ -101,11 +101,11 @@ class GraphHeadAttention(Module):
 
         dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
 
-        # 🔥 Add Gaussian distance bias
+        #  Add Gaussian distance bias
         dots = dots + self.bias
 
         # ---------------------------
-        # 🔥 Multi-scale sparse attention
+        #  Multi-scale sparse attention
         # ---------------------------
         sparse_attn_list = []
 
@@ -128,12 +128,12 @@ class GraphHeadAttention(Module):
         multi_sparse_attn = (weights * sparse_stack).sum(dim=0)
 
         # ---------------------------
-        # 🔥 Global attention
+        #  Global attention
         # ---------------------------
         global_attn = self.attend(dots)
 
         # ---------------------------
-        # 🔥 Combine
+        #  Combine
         # ---------------------------
         attn = multi_sparse_attn
 
